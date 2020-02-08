@@ -14,6 +14,7 @@ int main(int argc, char *argv[])
 
     Timer timer;
 
+    printf("Size of float: %lu", sizeof(float));
     for(int test = 1; test <= 10; test++)
     {
         std::cout << "Running test iteration " << std::setw(2) << test << " ";
