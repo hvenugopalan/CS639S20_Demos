@@ -7,22 +7,48 @@
 
 void Copy(const float (&x)[XDIM][YDIM][ZDIM], float (&y)[XDIM][YDIM][ZDIM])
 {
+#ifndef DO_NOT_USE_MKL
+
 #pragma omp parallel for    
     for (int i = 1; i < XDIM-1; i++)
     for (int j = 1; j < YDIM-1; j++)
     for (int k = 1; k < ZDIM-1; k++)
         y[i][j][k] = x[i][j][k];
+
+#else
+	cblas_scopy(
+		XDIM*YDIM*ZDIM, 
+		&x[0][0][0],
+		1,
+		&y[0][0][0],
+		1);
+#endif
 }
+	
 
 void Saxpy(const float (&x)[XDIM][YDIM][ZDIM], const float (&y)[XDIM][YDIM][ZDIM],
     float (&z)[XDIM][YDIM][ZDIM],
     const float scale)
 {
+#ifndef DO_NOT_USE_MKL
+
 #pragma omp parallel for
     for (int i = 0; i < XDIM; i++)
     for (int j = 0; j < YDIM; j++)
     for (int k = 0; k < ZDIM; k++)
         z[i][j][k] = x[i][j][k] * scale + y[i][j][k];
+#else
+    Copy(y, z);
+    cblas_saxpy(
+	XDIM * YDIM * ZDIM,
+	scale,
+	&x[0][0][0],
+	1,
+	&y[0][0][0],
+	1
+	);
+#endif
+
 }
 
 void Saxpy(const float (&x)[XDIM][YDIM][ZDIM], float (&y)[XDIM][YDIM][ZDIM],
