@@ -1,13 +1,14 @@
 #include "PointwiseOps.h"
 
-// #define DO_NOT_USE_MKL
-#ifndef DO_NOT_USE_MKL
-#include <mkl.h>
-#endif
+#include<mkl.h>
+//#define DO_NOT_USE_MKL
+//#ifndef DO_NOT_USE_MKL
+//#include <mkl.h>
+//#endif
 
 void Copy(const float (&x)[XDIM][YDIM][ZDIM], float (&y)[XDIM][YDIM][ZDIM])
 {
-#ifndef DO_NOT_USE_MKL
+#ifdef DO_NOT_USE_MKL
 
 #pragma omp parallel for    
     for (int i = 1; i < XDIM-1; i++)
@@ -17,7 +18,7 @@ void Copy(const float (&x)[XDIM][YDIM][ZDIM], float (&y)[XDIM][YDIM][ZDIM])
 
 #else
 	cblas_scopy(
-		XDIM*YDIM*ZDIM, 
+		XDIM * YDIM * ZDIM, 
 		&x[0][0][0],
 		1,
 		&y[0][0][0],
@@ -30,8 +31,7 @@ void Saxpy(const float (&x)[XDIM][YDIM][ZDIM], const float (&y)[XDIM][YDIM][ZDIM
     float (&z)[XDIM][YDIM][ZDIM],
     const float scale)
 {
-#ifndef DO_NOT_USE_MKL
-
+#ifdef DO_NOT_USE_MKL
 #pragma omp parallel for
     for (int i = 0; i < XDIM; i++)
     for (int j = 0; j < YDIM; j++)
@@ -44,9 +44,8 @@ void Saxpy(const float (&x)[XDIM][YDIM][ZDIM], const float (&y)[XDIM][YDIM][ZDIM
 	scale,
 	&x[0][0][0],
 	1,
-	&y[0][0][0],
-	1
-	);
+	&z[0][0][0],
+	1);
 #endif
 
 }

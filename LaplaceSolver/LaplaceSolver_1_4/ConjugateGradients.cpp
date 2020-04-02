@@ -9,7 +9,11 @@
 #include <iostream>
 
 extern Timer timerLaplacian;
-extern Timer timerSaxpy;
+extern Timer timerSaxpy1;
+extern Timer timerSaxpy2;
+extern Timer timerNorm;
+extern Timer timerInnerProduct;
+extern Timer timerCopy;
 
 void ConjugateGradients(
     CSRMatrix& L,
@@ -22,17 +26,19 @@ void ConjugateGradients(
 {
     // Algorithm : Line 2
     timerLaplacian.Restart(); ComputeLaplacian( x, z); timerLaplacian.Pause();
-    Saxpy(z, f, r, -1);
+    timerSaxpy2.Restart(); Saxpy(z, f, r, -1); timerSaxpy2.Pause();
     float nu = Norm(r);
 
     // Algorithm : Line 3
     if (nu < nuMax) return;
 
     // Algorithm : Line 4
-    Copy(r, p);
+    timerCopy.Restart(); Copy(r, p); timerCopy.Pause();
     ForwardSubstitution(L, &p[0][0][0]);
     BackwardSubstitution(L, &p[0][0][0]);
+    timerInnerProduct.Restart();
     float rho=InnerProduct(p, r);
+    timerInnerProduct.Pause();
         
     // Beginning of loop from Line 5
     for(int k=0;;k++)
@@ -41,28 +47,36 @@ void ConjugateGradients(
 
         // Algorithm : Line 6
         timerLaplacian.Restart(); ComputeLaplacian(p, z); timerLaplacian.Pause();
-        float sigma=InnerProduct(p, z);
+        timerInnerProduct.Restart();
+	float sigma=InnerProduct(p, z);
+	timerInnerProduct.Pause();
 
         // Algorithm : Line 7
         float alpha=rho/sigma;
 
         // Algorithm : Line 8
-        timerSaxpy.Restart(); Saxpy(z, r, -alpha); timerSaxpy.Pause();
-        nu=Norm(r);
+        timerSaxpy1.Restart(); Saxpy(z, r, -alpha); timerSaxpy1.Pause();
+        timerNorm.Restart();
+	nu=Norm(r);
+	timerNorm.Pause();
 
         // Algorithm : Lines 9-12
         if (nu < nuMax || k == kMax) {
-            timerSaxpy.Restart(); Saxpy(p, x, alpha); timerSaxpy.Pause();
+            timerSaxpy1.Restart(); Saxpy(p, x, alpha); timerSaxpy1.Pause();
             std::cout << "Conjugate Gradients terminated after " << k << " iterations; residual norm (nu) = " << nu << std::endl;
             if (writeIterations) WriteAsImage("x", x, k, 0, 127);
             return;
         }
 
         // Algorithm : Line 13
+	timerCopy.Restart();
         Copy(r, z);
+	timerCopy.Pause();
         ForwardSubstitution(L, &z[0][0][0]);
         BackwardSubstitution(L, &z[0][0][0]);
-        float rho_new = InnerProduct(z, r);
+        timerInnerProduct.Restart();
+	float rho_new = InnerProduct(z, r);
+	timerInnerProduct.Pause();
 
         // Algorithm : Line 14
         float beta = rho_new/rho;
@@ -71,8 +85,8 @@ void ConjugateGradients(
         rho=rho_new;
 
         // Algorithm : Line 16
-        timerSaxpy.Restart(); Saxpy(p, x, alpha); timerSaxpy.Pause();
-        Saxpy(p, z, p, beta);
+        timerSaxpy1.Restart(); Saxpy(p, x, alpha); timerSaxpy1.Pause();
+        timerSaxpy2.Restart(); Saxpy(p, z, p, beta); timerSaxpy2.Pause();
 
         if (writeIterations) WriteAsImage("x", x, k, 0, XDIM/2);
     }

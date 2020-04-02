@@ -1,4 +1,5 @@
 #include "Reductions.h"
+#include <algorithm>
 
 //#define DO_NOT_USE_MKL
 #ifndef DO_NOT_USE_MKL
@@ -41,9 +42,8 @@ float InnerProduct(const float (&x)[XDIM][YDIM][ZDIM], const float (&y)[XDIM][YD
     	for (int k = 1; k < ZDIM-1; k++)
         	result += (double) x[i][j][k] * (double) y[i][j][k];
     #else
-	result = cblas_sdsdot(
+	result = cblas_dsdot(
 		       XDIM * YDIM * ZDIM,
-	       		0,
 	 		&x[0][0][0],
 			1,
 			&y[0][0][0],

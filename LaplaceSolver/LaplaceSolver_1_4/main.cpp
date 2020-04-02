@@ -4,7 +4,11 @@
 #include "Utilities.h"
 
 Timer timerLaplacian;
-Timer timerSaxpy;
+Timer timerSaxpy1;
+Timer timerSaxpy2;
+Timer timerNorm;
+Timer timerInnerProduct;
+Timer timerCopy;
 
 int main(int argc, char *argv[])
 {
@@ -41,10 +45,14 @@ int main(int argc, char *argv[])
 
     // Call Conjugate Gradients algorithm
     {	
-    timerLaplacian.Reset(); timerSaxpy.Reset();
+    timerLaplacian.Reset(); timerSaxpy1.Reset(); timerSaxpy2.Reset();	timerNorm.Reset(); timerInnerProduct.Reset(); timerCopy.Reset();
     ConjugateGradients( L, x, f, p, r, z, true);
     timerLaplacian.Print("Total Laplacian Time : ");
-    timerSaxpy.Print("Total Saxpy Time : ");
+    timerSaxpy1.Print("Total Saxpy1 Time : ");
+    timerSaxpy2.Print("Total Saxpy2 Time : ");
+    timerNorm.Print("Total Norm Time : ");
+    timerInnerProduct.Print("Total Inner Product Time : ");
+    timerCopy.Print("Total Copy Time : ");
     }
 
     return 0;
