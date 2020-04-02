@@ -12,7 +12,6 @@ extern Timer timerLaplacian;
 extern Timer timerSaxpy;
 
 void ConjugateGradients(
-    CSRMatrix& matrix,
     CSRMatrix& L,
     float (&x)[XDIM][YDIM][ZDIM],
     const float (&f)[XDIM][YDIM][ZDIM],
@@ -22,7 +21,7 @@ void ConjugateGradients(
     const bool writeIterations)
 {
     // Algorithm : Line 2
-    timerLaplacian.Restart(); ComputeLaplacian(matrix, x, z); timerLaplacian.Pause();
+    timerLaplacian.Restart(); ComputeLaplacian( x, z); timerLaplacian.Pause();
     Saxpy(z, f, r, -1);
     float nu = Norm(r);
 
@@ -41,7 +40,7 @@ void ConjugateGradients(
         std::cout << "Residual norm (nu) after " << k << " iterations = " << nu << std::endl;
 
         // Algorithm : Line 6
-        timerLaplacian.Restart(); ComputeLaplacian(matrix, p, z); timerLaplacian.Pause();
+        timerLaplacian.Restart(); ComputeLaplacian(p, z); timerLaplacian.Pause();
         float sigma=InnerProduct(p, z);
 
         // Algorithm : Line 7

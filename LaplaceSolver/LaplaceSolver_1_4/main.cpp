@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
         Timer timer;
         timer.Start();
         InitializeProblem(x, f);
-        matrix = BuildLaplacianMatrix(); // This takes a while ...
+        
         L = BuildPreconditionerMatrix(); // This takes a while ...
 
         // Make sure that the preconditioner is a valid lower-triangular CSR matrix ...
@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
     // Call Conjugate Gradients algorithm
     {	
     timerLaplacian.Reset(); timerSaxpy.Reset();
-    ConjugateGradients(matrix, L, x, f, p, r, z, true);
+    ConjugateGradients( L, x, f, p, r, z, true);
     timerLaplacian.Print("Total Laplacian Time : ");
     timerSaxpy.Print("Total Saxpy Time : ");
     }
